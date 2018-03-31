@@ -21,6 +21,7 @@ func init() {
 		Filename:  "log/log.txt",
 		MaxSize:   10, // 10MB
 		LocalTime: true,
+		Compress:  true,
 	}))
 
 	flag.BoolVar(&debug, "debug", false, "Run in debug mode")
