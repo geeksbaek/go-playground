@@ -4,7 +4,9 @@ import (
 	"flag"
 	"io"
 	"os"
+	"time"
 
+	"github.com/jasonlvhit/gocron"
 	log "github.com/sirupsen/logrus"
 	lumberjack "gopkg.in/natefinch/lumberjack.v2"
 )
@@ -17,17 +19,23 @@ func init() {
 
 	// Output to stdout instead of the default stderr
 	// Can be any io.Writer, see below for File example
-	log.SetOutput(io.MultiWriter(os.Stdout, &lumberjack.Logger{
+	l := &lumberjack.Logger{
 		Filename:  "log/log.txt",
 		MaxSize:   10, // 10MB
 		LocalTime: true,
 		Compress:  true,
-	}))
+	}
+	log.SetOutput(io.MultiWriter(os.Stdout, l))
 
 	flag.BoolVar(&debug, "debug", false, "Run in debug mode")
 
 	// Info 로그부터 출력함
 	log.SetLevel(log.InfoLevel)
+
+	gocron.Every(1).Minutes().Do(func() {
+		l.Rotate()
+	})
+	
 }
 
 func main() {
@@ -44,6 +52,7 @@ func main() {
 		log.Debug("Useful debugging information.")
 		log.Info("Something noteworthy happened!")
 		log.Warn("You should probably take a look at this.")
+		time.Sleep(time.Second)
 	}
 
 	log.Info("Finished logging")
